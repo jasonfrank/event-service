@@ -17,12 +17,13 @@
 # have to execute the following command when you start a new bash:
 #
 #   source VIRT/bin/activate
+#   source setup.sh
 #
 # That will setup your bash prompt and environment for the project.
 
 # Add MySQL to lib path
 echo "Adding MySQL to lib path ..."
-export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
 
 # Install deps
 echo "Installing python library dependencies ..."
