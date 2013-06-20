@@ -5,6 +5,7 @@
 #   Python
 #   pip (package installer for Python)
 #   MySQL
+#   SQLite3 (for testing)
 #
 # If you want to work in a virtual environment, set that up first.
 # From a clean install:
@@ -23,6 +24,9 @@
 
 echo "Adding MySQL to lib path ..."
 export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
+
+echo "Adding src to PYTHONPATH ..."
+export PYTHONPATH="$PWD/src:$PYTHONPATH"
 
 echo "Installing python library dependencies ..."
 pip install MySQL-python
