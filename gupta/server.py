@@ -34,9 +34,6 @@ class EventQuery:
             entityIds = i.entityIds
             if entityIds is not None:
                 entityIds = json.loads(entityIds)
-                # convert to ints
-                entityIds = dict([(int(key), int(val))
-                                  for key,val in entityIds])
             eventList = Event.load_from_db(db,
                                            applicationId=applicationId,
                                            start=start,
@@ -58,7 +55,10 @@ class CreateEvent:
             j = web.data()
             evt = Event.from_json(j)
             evt.save(db)
-            ok_json = {'status' : 'ok'}
+            ok_json = {
+                'status'  : 'ok',
+                'eventId' : evt.eventId
+            }
             return json.dumps(ok_json)
         except Exception as e:
             err_json = {'status' : 'error', 'message' : str(e)}

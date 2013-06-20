@@ -118,33 +118,40 @@ class Event:
         """
         wheres = []
         # application ID
-        wheres.append('event.application_id = %d' % applicationId)
+        wheres.append('event.application_id = %d' % int(applicationId))
         # start time
-        wheres.append('event.event_time > %d' % start)
+        wheres.append('event.event_time > %d' % int(start))
         # end time
         if end is not None:
-            wheres.append('event.event_time < %d' % end)
+            wheres.append('event.event_time < %d' % int(end))
         # filter by event_type_id
         if eventTypeId is not None:
-            wheres.append('event.event_type_id = %d' % eventTypeId)
-        # get the events
-        whereClause = ' AND '.join(wheres)
-        sqlIter = db.select(['event'], where=whereClause)
-        eventResults = [res for res in sqlIter]
+            wheres.append('event.event_type_id = %d' % int(eventTypeId))
 
-        # filters for entities in entityIds map
+        # Filters for entities in entityIds map. Build a complicated
+        # subquery only in the case where entityIds are specified.
         if entityIds is not None:
             entityWheres = []
             for entityType in entityIds:
                 for entId in entityIds[entityType]:
-                    typeClause = 'event_entity.entity_type = %d' % entityType
-                    idClause = 'event_entity.entity_id = %d' % endId
+                    typeClause = 'ent2.entity_type = %d' % int(entityType)
+                    idClause = 'ent2.entity_id = %d' % int(entId)
                     entClause = ' AND '.join([typeClause, idClause])
                     entityWheres.append('(' + entClause + ')')
             if len(entityWheres) > 1:
-                wheres.append('(' + ' OR '.join(entityWheres) + ')')
+                entity_where_str = '(' + ' OR '.join(entityWheres) + ')'
             else:
-                wheres.append(entityWheres[0])
+                entity_where_str = entityWheres[0]
+            entity_cond = ('event.application_id IN ' +
+                           '(SELECT e2.application_id FROM event e2, ' +
+                           'event_entity ent2 WHERE e2.id = ent2.event_id ' +
+                           'AND %s)') % entity_where_str
+            wheres.append(entity_cond)
+
+        # get the events
+        whereClause = ' AND '.join(wheres)
+        sqlIter = db.select(['event'], where=whereClause)
+        eventResults = [res for res in sqlIter]
 
         # get events and entities
         wheres.append('event.id = event_entity.event_id')
