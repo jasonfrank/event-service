@@ -1,30 +1,24 @@
 #!/bin/bash
 
-set -e
-
-# setup virtualenv
-if [ ! -d VIRT ] ; then
-    venvbin="`which virtualenv`"
-    if [[ "$venvbin" = "" ]] ; then
-        syspipbin="`which pip`"
-        if [[ "$syspipbin" = "" ]] ; then
-            syseasybin="`which easy_install`"
-            if [[ "$syseasybin" = "" ]] ; then
-                echo "Cannot find easy_install program for python"
-                exit 1;
-            fi
-            echo "Installing pip ..."
-            "$syseasybin" pip
-            syspipbin="`which pip`"
-        fi
-        echo "Installing virtualenv ..."
-        "$syspipbin" install virtualenv
-        venvbin="`which virtualenv`"
-    fi
-    "$venvbin" VIRT
-fi
-echo "Activating virtual environment VIRT ..."
-source VIRT/bin/activate
+# Prereqs:
+#
+#   Python
+#   pip (package installer for Python)
+#   MySQL
+#
+# If you want to work in a virtual environment, set that up first.
+# From a clean install:
+#
+#   sudo easy_install pip
+#   sudo pip install virtualenv
+#   virtualenv VIRT
+#
+# This will give you a working virtual environment. From now on, you
+# have to execute the following command when you start a new bash:
+#
+#   source VIRT/bin/activate
+#
+# That will setup your bash prompt and environment for the project.
 
 # Add MySQL to lib path
 echo "Adding MySQL to lib path ..."
@@ -32,6 +26,7 @@ export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
 
 # Install deps
 echo "Installing python library dependencies ..."
-VIRT/bin/pip install MySQL-python
-VIRT/bin/pip install web.py
-VIRT/bin/pip install requests
+pip install MySQL-python
+pip install web.py
+pip install requests
+pip install nose
