@@ -1,4 +1,4 @@
-"""Configuration information for Gupta event API"""
+"""Configuration information for Gupta Event API"""
 
 import web
 

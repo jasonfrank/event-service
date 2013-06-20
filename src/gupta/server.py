@@ -2,10 +2,10 @@
 
 import web
 import json
-import config
-from Event import Event
+import gupta.config
+from gupta.event import Event
 
-db = config.db
+db = gupta.config.db
 
 urls = (
     '/', 'Index',
@@ -50,10 +50,6 @@ class EventQuery:
         except Exception as e:
             err_json = {'status' : 'error', 'message' : str(e)}
             raise web.badrequest(json.dumps(err_json))
-
-    def select(self, applicationId, start, end=None,
-               eventTypeId=None, entityIds=None):
-        return sql
         
 class CreateEvent:
     def POST(self):

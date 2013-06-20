@@ -4,22 +4,17 @@ Classes:
     Event: Event object
     Entity: Related entity of an Event
     EventError: Exception class for Event
+
+To make an Event object and associated entities from JSON, call:
+Event.from_json(json_obj)
+
+To load events from the database, see:
+Event.load_from_db( ... )
 """
 
 import json
 from datetime import datetime
-
-def _millis(dt=None):
-    """Return epoch time in milliseconds.
-
-    Optionally takes a datetime parameter. Default is to return
-    current epoch time in milliseconds.
-    """
-    if dt is None:
-        dt = datetime.now()
-    epoch = datetime.utcfromtimestamp(0)
-    delta = dt - epoch
-    return int(delta.total_seconds() * 1000)
+from gupta.util import millis
 
 class EventError(Exception):
     pass
@@ -58,7 +53,7 @@ class Event:
         self.body = body
         self.eventId = eventId
         if eventTime is None:
-            self.eventTime = _millis()
+            self.eventTime = millis()
         else:
             self.eventTime = eventTime
         if relatedEntities is None:
@@ -233,4 +228,3 @@ class Entity:
     def __init__(self, entityType, entityId):
         self.entityType = entityType
         self.entityId = entityId
-
