@@ -24,10 +24,6 @@
 echo "Adding MySQL to lib path ..."
 export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
 
-curdir="$PWD"
-echo "Adding $curdir/src to PYTHONPATH ..."
-export PYTHONPATH="$curdir/src:$PYTHONPATH"
-
 echo "Installing python library dependencies ..."
 pip install MySQL-python
 pip install web.py
