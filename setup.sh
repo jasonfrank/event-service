@@ -21,11 +21,13 @@
 #
 # That will setup your bash prompt and environment for the project.
 
-# Add MySQL to lib path
 echo "Adding MySQL to lib path ..."
 export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
 
-# Install deps
+curdir="$PWD"
+echo "Adding $curdir/src to PYTHONPATH ..."
+export PYTHONPATH="$curdir/src:$PYTHONPATH"
+
 echo "Installing python library dependencies ..."
 pip install MySQL-python
 pip install web.py
