@@ -13,20 +13,17 @@
 #   sudo easy_install pip
 #   sudo pip install virtualenv
 #   virtualenv VIRT
+#   source setup.sh
 #
 # This will give you a working virtual environment. From now on, you
 # have to execute the following command when you start a new bash:
 #
 #   source VIRT/bin/activate
-#   source setup.sh
+#   source env.sh
 #
 # That will setup your bash prompt and environment for the project.
 
-echo "Adding MySQL to lib path ..."
-export DYLD_LIBRARY_PATH="/usr/local/mysql/lib:$DYLD_LIBRARY_PATH"
-
-echo "Adding src to PYTHONPATH ..."
-export PYTHONPATH="$PWD/src:$PYTHONPATH"
+[[ -r env.sh ]] && source env.sh
 
 echo "Installing python library dependencies ..."
 pip install MySQL-python

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import web
 import json
 import gupta.config
@@ -64,6 +65,11 @@ class CreateEvent:
             err_json = {'status' : 'error', 'message' : str(e)}
             raise web.badrequest(json.dumps(err_json))
 
-if __name__ == '__main__':
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv
     app = web.application(urls, globals())
     app.run()
+
+if __name__ == '__main__':
+    main()

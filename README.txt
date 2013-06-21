@@ -12,23 +12,28 @@ setup.sh to get virtualenv up and running. Then, in bash:
 
 This will setup the environment variables and libraries you need.
 
-Edit the file src/gupta/config.py to point to your database server, or
+Edit the file gupta/config.py to point to your database server, or
 uncomment the SQLite configuration for a quick dev environment.
 
-To run the event server:
+To run the event server in the background and log to event_server.log:
 
-  python src/gupta/server.py
+  bin/event_server &>event_server.log &
 
 Click "Allow" on the security widget that pops up in OS X.
 
 Try out the event service with:
 
-  python src/post_test.py
+  bin/test_post
 
 You should see one passing and one failing post. After that, you can
 navigate your browser to:
 [http://0.0.0.0:8080/getEvents?applicationId=1&start=0]
 You should see the test event.
+
+To kill the service:
+
+  fg 1
+  <Ctrl-C>
 
 Prerequisites
 =============
@@ -59,8 +64,13 @@ Activate the environment and get everything setup with:
   source VIRT/bin/activate
   source setup.sh
 
-These two commands need to be run at the beginning of every bash
-session.
+From now on two commands need to be run at the beginning of every bash
+session:
+
+  # Activate virtual environment
+  source VIRT/bin/activate
+  # Export environment variables for MySQL and Python
+  source env.sh
 
 Packages
 --------
@@ -76,8 +86,8 @@ Nose is a testing environment I haven't quite figured out yet.
 Python Path
 -----------
 
-The PYTHONPATH environment variable needs to be set. setup.sh takes
-care of this.
+The PYTHONPATH environment variable needs to be set. env.sh takes care
+of this. env.sh is automatically sourced by setup.sh.
 
 The Database
 ------------
@@ -97,17 +107,17 @@ SQLite3 setup example:
 Configuration
 -------------
 
-Configuration right now is handled in src/gupta/config.py. The only
-item to be configured so far is the database. Specify the data source
-name and any parameters it needs (filename, username, password,
-database name, etc).
+Configuration right now is handled in gupta/config.py. The only item
+to be configured so far is the database. Specify the data source name
+and any parameters it needs (filename, username, password, database
+name, etc).
 
 The Server
 ==========
 
 The server can be run with:
 
-  python src/gupta/server.py
+  bin/event_server
 
 It starts up listening on the localhost on port 8080. I haven't done
 anything fancy at the OS level with firewalls, just clicked Allow. I
@@ -118,10 +128,10 @@ Testing
 
 A basic post test can be run with:
 
-  python src/post_test.py
+  bin/test_post
 
 The beginnings of a more comprehensive test suite are run with:
 
-  python src/gupta/eventtest.py
+  python gupta/test/test_event.py
 
 All tests should pass. Testing needs to be more comprehensive.
