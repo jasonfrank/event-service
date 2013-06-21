@@ -1,6 +1,22 @@
 Gupta Event API Documentation
 
-Updated: 2013-06-20
+Updated: 2013-06-21
+
+Contents
+========
+
+* Quick Start Guide
+* Prerequisites
+* Setup
+  * Virtualenv
+  * Packages
+  * Python Path
+  * The Database
+  * Configuration
+* The Server
+* Testing
+* Running in Apache
+
 
 Quick Start Guide
 =================
@@ -35,6 +51,7 @@ To kill the service:
   fg 1
   <Ctrl-C>
 
+
 Prerequisites
 =============
 
@@ -47,6 +64,7 @@ Virtualenv eases setting up a fresh environment:
   sudo pip install virtualenv
 
 pip is a nice package installer for Python.
+
 
 Setup
 =====
@@ -112,6 +130,7 @@ to be configured so far is the database. Specify the data source name
 and any parameters it needs (filename, username, password, database
 name, etc).
 
+
 The Server
 ==========
 
@@ -123,6 +142,7 @@ It starts up listening on the localhost on port 8080. I haven't done
 anything fancy at the OS level with firewalls, just clicked Allow. I
 need to test this with remote hosts to make sure it can get through.
 
+
 Testing
 =======
 
@@ -132,6 +152,23 @@ A basic post test can be run with:
 
 The beginnings of a more comprehensive test suite are run with:
 
-  python gupta/test/test_event.py
+  nosetests
+
+Nose is an automatic testing harness for Python that automatically
+finds and runs tests defined with Python's built-in unittest library.
 
 All tests should pass. Testing needs to be more comprehensive.
+
+
+Running in Apache
+=================
+
+Apache needs to be configured to run Python. I don't know much about
+this aspect. I've come across a lot of acronyms and I don't know
+enough to tell the differences, but perhaps you have more experience
+in this area.
+
+From my reading I believe the common way to do this is with WSGI:
+[https://code.google.com/p/modwsgi/]
+
+I will add more information here as I learn it.
