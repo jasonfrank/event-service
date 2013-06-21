@@ -30,3 +30,7 @@ pip install MySQL-python
 pip install web.py
 pip install requests
 pip install nose
+
+echo "Setting up sqlite db for development ..."
+mkdir -p data
+sqlite3 data/event.db < db/sqlite_tables.sql
