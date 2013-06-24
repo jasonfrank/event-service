@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import gupta.server
+
+if __name__ == '__main__':
+   gupta.server.main()

@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+import gupta.test.test_post
+
+if __name__ == '__main__':
+   gupta.test.test_post.main()
