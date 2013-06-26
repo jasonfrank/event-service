@@ -30,6 +30,7 @@ pip install MySQL-python
 pip install web.py
 pip install requests
 pip install nose
+pip install paste
 
 echo "Setting up sqlite db for development ..."
 mkdir -p data

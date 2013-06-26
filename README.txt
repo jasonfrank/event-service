@@ -99,7 +99,8 @@ The event service depends on:
 * web.py
 * requests
 
-Nose is a testing environment I haven't quite figured out yet.
+Nose and paste are testing environments I haven't quite figured out
+yet.
 
 Python Path
 -----------
@@ -119,7 +120,7 @@ MySQL setup example:
 
 SQLite3 setup example:
 
-  mkdir data
+  mkdir -p data
   sqlite3 data/event.db < db/sqlite_tables.sql
 
 Configuration
