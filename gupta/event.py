@@ -194,7 +194,7 @@ class Event:
         try:
             return d[k]
         except KeyError as e:
-            raise ValueError("Can't find required attribute `%s'" % e.message)
+            raise ValueError("Can't find required attribute '%s'" % e.message)
 
     @staticmethod
     def from_json(event_json):
