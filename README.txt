@@ -56,7 +56,7 @@ Prerequisites
 =============
 
 You will need MySQL running for the MySQL service, although the
-sqlite3 configuration can be uncommented for an easy trial.
+sqlite3 configuration can be used for an easy trial.
 
 Virtualenv eases setting up a fresh environment:
 
@@ -126,10 +126,10 @@ SQLite3 setup example:
 Configuration
 -------------
 
-Configuration right now is handled in gupta/config.py. The only item
-to be configured so far is the database. Specify the data source name
-and any parameters it needs (filename, username, password, database
-name, etc).
+Configuration is handled in event.cfg. The only item to be configured
+so far is the database. Specify the data source name and any
+parameters it needs (filename, username, password, database name,
+etc). See example.cfg for examples and options.
 
 
 The Server

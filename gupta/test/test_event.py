@@ -10,6 +10,7 @@ from tempfile import NamedTemporaryFile
 from gupta.event import Event, EventError
 from gupta.util import nostderr
 import gupta.test.data
+from gupta.config import EventConfig
 
 class JsonTest(unittest.TestCase):
     """Unit tests for building Event objects from JSON"""

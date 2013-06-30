@@ -6,9 +6,9 @@ import json
 import gupta.config
 from gupta.event import Event
 
-db = gupta.config.db
+_db = gupta.config.get_database()
 
-urls = (
+_urls = (
     '/', 'Index',
     '/newEvent', 'CreateEvent',
     '/getEvents', 'EventQuery'
@@ -35,7 +35,7 @@ class EventQuery:
             entityIds = i.entityIds
             if entityIds is not None:
                 entityIds = json.loads(entityIds)
-            eventList = Event.load_from_db(db,
+            eventList = Event.load_from_db(_db,
                                            applicationId=applicationId,
                                            start=start,
                                            end=end,
@@ -55,7 +55,7 @@ class CreateEvent:
         try:
             j = web.data()
             evt = Event.from_json(j)
-            evt.save(db)
+            evt.save(_db)
             ok_json = {
                 'status'  : 'ok',
                 'eventId' : evt.eventId
@@ -68,7 +68,7 @@ class CreateEvent:
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    app = web.application(urls, globals())
+    app = web.application(_urls, globals())
     app.run()
 
 if __name__ == '__main__':

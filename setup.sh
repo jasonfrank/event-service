@@ -35,3 +35,4 @@ pip install paste
 echo "Setting up sqlite db for development ..."
 mkdir -p data
 sqlite3 data/event.db < db/sqlite_tables.sql
+cp example.cfg event.cfg
