@@ -4,13 +4,12 @@ import os
 import unittest
 import web
 import json
-import re
 
 from tempfile import NamedTemporaryFile
 from gupta.event import Event, EventError
 from gupta.util import nostderr
 import gupta.test.data
-from gupta.config import EventConfig
+from gupta.config import EventConfig, get_test_database
 
 class JsonTest(unittest.TestCase):
     """Unit tests for building Event objects from JSON"""
@@ -59,18 +58,8 @@ class EventTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # create a temporary sqlite db in memory
-        cls.db = web.database(dbn='sqlite', db=':memory:')
-
-        # setup tables (poor man's sql split, no parsing)
-        with open('db/sqlite_tables.sql', 'r') as f:
-            sql_str = f.read()
-        sql = re.split(';$', sql_str, flags=re.M) # $ matches end of line
-        sql = [s.strip() for s in sql if s.strip() != '']
-        with nostderr():
-            for stmt in sql:
-                cls.db.query(stmt)
-
+        # get test database connection
+        cls.db = get_test_database()
         # get test seed data
         cls.test_data = gupta.test.data.TestData().json_strings()
 

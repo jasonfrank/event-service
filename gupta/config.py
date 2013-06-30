@@ -8,10 +8,14 @@ Classes:
 
 Convenience functions:
   - get_database: web.py database object from global config
+  - get_test_database: in-memory sqlite temporary database for testing
 """
 
+import re
 import web
 from ConfigParser import ConfigParser
+
+from gupta.util import nostderr
 
 class EventConfig(ConfigParser):
     """Wrapper objects for config information.
@@ -58,3 +62,20 @@ _default_config = EventConfig()
 def get_database():
     """Return web.database object built from global config"""
     return _default_config.get_database()
+
+def get_test_database():
+    """Return in-memory sqlite temporary database for testing"""
+
+    # create a temporary sqlite db in memory
+    db = web.database(dbn='sqlite', db=':memory:')
+
+    # setup tables (poor man's sql split, no parsing)
+    with open('db/sqlite_tables.sql', 'r') as f:
+        sql_str = f.read()
+    sql = re.split(';$', sql_str, flags=re.M) # $ matches end of line
+    sql = [s.strip() for s in sql if s.strip() != '']
+    with nostderr():
+        for stmt in sql:
+            db.query(stmt)
+
+    return db
