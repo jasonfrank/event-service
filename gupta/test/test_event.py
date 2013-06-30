@@ -4,25 +4,18 @@ import os
 import unittest
 import web
 import json
-from subprocess import call
+import re
+
 from tempfile import NamedTemporaryFile
 from gupta.event import Event, EventError
+from gupta.util import nostderr
+import gupta.test.data
 
 class JsonTest(unittest.TestCase):
     """Unit tests for building Event objects from JSON"""
 
     def setUp(self):
-        self.json = {
-            'applicationId'   : 1,
-            'eventTypeId'     : 1,
-            'headline'        : 'This is a headline',
-            'body'            : 'Something happened',
-            "eventTime"       : 13004923084,
-            "relatedEntities" : {
-                "1" : [14, 16],
-                "2" : [1, 4]
-            }
-        }
+        self.json = gupta.test.data.TestData().json_objects()[0]
 
     def test_raise_error_on_empty_string(self):
         self.assertRaises(ValueError, Event.from_json, '')
@@ -56,33 +49,107 @@ class JsonTest(unittest.TestCase):
         self.assertEqual(evt.eventTime, self.json['eventTime'])
         self.assertEqual(len(evt.relatedEntities), 4)
 
-class GuptaBaseTest(unittest.TestCase):
-    "Provide db setup and teardown for Gupta Event tests"
+class EventTest(unittest.TestCase):
+    "Test Event save and load functions"
+
+    #######################################
+    # EventTest: Test framework functions #
+    #######################################
 
     @classmethod
     def setUpClass(cls):
-        tmpfile = NamedTemporaryFile(delete=False)
-        tmpfile.close()
-        cls.dbfile = tmpfile.name
-        with open('db/sqlite_tables.sql', 'r') as setup_file:
-            call(['sqlite3', cls.dbfile], stdin=setup_file)
-        cls.db = web.database(dbn='sqlite', db=cls.dbfile)
+        # create a temporary sqlite db in memory
+        cls.db = web.database(dbn='sqlite', db=':memory:')
+
+        # setup tables (poor man's sql split, no parsing)
+        with open('db/sqlite_tables.sql', 'r') as f:
+            sql_str = f.read()
+        sql = re.split(';$', sql_str, flags=re.M) # $ matches end of line
+        sql = [s.strip() for s in sql if s.strip() != '']
+        with nostderr():
+            for stmt in sql:
+                cls.db.query(stmt)
+
+        # get test seed data
+        cls.test_data = gupta.test.data.TestData().json_strings()
+
+    def setUp(self):
+        self.save_test_data()
+
+    def tearDown(self):
+        self.clear()
 
     @classmethod
     def tearDownClass(cls):
-        os.unlink(cls.dbfile)
+        # close temporary sqlite db
+        cls.db = None
 
-class EmptyTest(GuptaBaseTest):
-    """Unit tests for when Events are empty"""
+    ###############################
+    # EventTest: Helper functions #
+    ###############################
+
+    def save_test_data(self):
+        """save test data to db"""
+        with nostderr():
+            for d in self.test_data:
+                evt = Event.from_json(d)
+                evt.save(self.db)
+
+    def clear(self):
+        """clear test db for new test"""
+        with nostderr():
+            self.db.query('delete from event where id > 0')
+            self.db.query('delete from event_entity where id > 0')
+
+    ####################
+    # EventTest: tests #
+    ####################
+
+    # empty database
     def test_query_on_empty_db(self):
-        event_list = Event.load_from_db(self.db, applicationId=1, start=0)
-        self.assertEqual(len(event_list), 0)
+        self.clear()
+        with nostderr():
+            events = Event.load_from_db(self.db, applicationId=1, start=0)
+        self.assertEqual(len(events), 0)
 
-class SaveTest(GuptaBaseTest):
-    pass
+    # save tests
+    def test_is_saved_before(self):
+        evt = Event.from_json(self.test_data[0])
+        self.assertFalse(evt.is_saved())
+    def test_is_saved_after(self):
+        evt = Event.from_json(self.test_data[0])
+        with nostderr():
+            evt.save(self.db)
+        self.assertTrue(evt.is_saved())
+    def test_raise_error_on_already_saved(self):
+        evt = Event.from_json(self.test_data[0])
+        with nostderr():
+            evt.save(self.db)
+        self.assertRaises(EventError, evt.save, self.db)
 
-class QueryTest(GuptaBaseTest):
-    pass
+    # query tests
+    def test_app_query(self):
+        with nostderr():
+            events = Event.load_from_db(self.db, applicationId=1, start=0)
+        self.assertEqual(8, len(events))
+    def test_cutoff_query_1(self):
+        with nostderr():
+            events = Event.load_from_db(
+                self.db,
+                applicationId=1,
+                start=15,
+                end=35
+            )
+        self.assertEqual(4, len(events))
+    def test_entity_query_1(self):
+        with nostderr():
+            events = Event.load_from_db(
+                self.db,
+                applicationId=1,
+                start=5,
+                entityIds={'1' : [14, 15]}
+            )
+        self.assertEqual(3, len(events))
 
 if __name__ == '__main__':
     unittest.main()

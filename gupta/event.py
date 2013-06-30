@@ -108,15 +108,9 @@ class Event:
         return myDict
 
     @staticmethod
-    def load_from_db(db, applicationId, start, end=None, eventTypeId=None,
-                     entityIds=None):
-        """Return a list of matching Event objects from the db.
-
-        Parameters to this method narrow the matches. Required
-        parameters are applicationId and start time. Optional
-        parameters are end time, eventTypeId, and entityIds.
-        """
+    def _sql_where_clause(applicationId, start, end, eventTypeId, entityIds):
         wheres = []
+
         # application ID
         wheres.append('event.application_id = %d' % int(applicationId))
         # start time
@@ -142,21 +136,33 @@ class Event:
                 entity_where_str = '(' + ' OR '.join(entityWheres) + ')'
             else:
                 entity_where_str = entityWheres[0]
-            entity_cond = ('event.application_id IN ' +
-                           '(SELECT e2.application_id FROM event e2, ' +
-                           'event_entity ent2 WHERE e2.id = ent2.event_id ' +
+            entity_cond = ('event.id IN ' +
+                           '(SELECT e2.id FROM event e2, ' +
+                           'event_entity ent2 ' +
+                           'WHERE e2.id = ent2.event_id ' +
                            'AND %s)') % entity_where_str
             wheres.append(entity_cond)
 
+        return ' AND '.join(wheres)
+
+    @staticmethod
+    def load_from_db(db, applicationId, start, end=None, eventTypeId=None,
+                     entityIds=None):
+        """Return a list of matching Event objects from the db.
+
+        Parameters to this method narrow the matches. Required
+        parameters are applicationId and start time. Optional
+        parameters are end time, eventTypeId, and entityIds.
+        """
         # get the events
-        whereClause = ' AND '.join(wheres)
+        whereClause = Event._sql_where_clause(applicationId, start, end,
+                                              eventTypeId, entityIds)
         sqlIter = db.select(['event'], where=whereClause)
         eventResults = [res for res in sqlIter]
 
         # get events and entities
-        wheres.append('event.id = event_entity.event_id')
-        whereClause = ' AND '.join(wheres)
-        sqlIter = db.select(['event', 'event_entity'], where=whereClause)
+        whereClause2 = whereClause + ' AND event.id = event_entity.event_id'
+        sqlIter = db.select(['event', 'event_entity'], where=whereClause2)
         entityResults = [res for res in sqlIter]
 
         # map event Ids to list of Entity objects
